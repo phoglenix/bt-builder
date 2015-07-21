@@ -4,11 +4,14 @@ This is prototype code for building a behaviour tree from examples of expert beh
 This code is explained in the accompanying paper to be made available [here](https://www.cs.auckland.ac.nz/research/gameai/publications.php) soon.
 
 To run, this code requires:
- - [MEME Suite v4.10.0_4](http://meme-suite.org/doc/download.html) (modified to allow for larger alphabets, modifications in the meme_4.10.0 directory).
+ - [MEME Suite v4.10.0_4](http://meme-suite.org/doc/download.html) modified to allow for larger alphabets (modifications included here).
  - [XStream v1.4.7](https://x-stream.github.io/) for serialisation of trees.
- - Starcraft gameplay traces as [recorded](http://scidrive.uoa.auckland.ac.nz/gameai/) by [ScExtractor](https://github.com/phoglenix/ScExtractor) and a JDBC driver to read the databases.
- - [JNIBWAPI v1.0](https://github.com/JNIBWAPI/JNIBWAPI/releases/tag/v1.0) for Starcraft data handling.
  - Apache Commons IO and Collections.
+
+As it is currently set up to work with Starcraft data, it also requires:
+ - Starcraft gameplay traces as [recorded](http://scidrive.uoa.auckland.ac.nz/gameai/) by [ScExtractor](https://github.com/phoglenix/ScExtractor).
+ - A JDBC driver to read the Starcraft databases.
+ - [JNIBWAPI v1.0](https://github.com/JNIBWAPI/JNIBWAPI/releases/tag/v1.0) for Starcraft data handling (included here).
 
 ## Disclaimer
 
