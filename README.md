@@ -1,7 +1,7 @@
 # bt-builder
 
 This is prototype code for building a behaviour tree from examples of expert behaviour.
-This code is explained in the accompanying paper to be made available [here](https://www.cs.auckland.ac.nz/research/gameai/publications.php) soon.
+This code is explained in the accompanying paper [Building Behavior Trees from Observations in Real-Time Strategy Games](https://www.cs.auckland.ac.nz/research/gameai/publications.php).
 
 To run, this code requires:
  - [MEME Suite v4.10.0_4](http://meme-suite.org/doc/download.html) modified to allow for larger alphabets (modifications included here).
