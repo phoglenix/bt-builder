@@ -15,6 +15,7 @@ import jnibwapi.types.RaceType;
 import jnibwapi.types.RaceType.RaceTypes;
 import jnibwapi.types.UnitCommandType.UnitCommandTypes;
 import util.DbConnection;
+import util.UnitAttributes.UnitAttribute;
 
 public class PlayerReplay {
 	private static final Logger LOGGER = Logger.getLogger(PlayerReplay.class.getName());
@@ -42,6 +43,19 @@ public class PlayerReplay {
 	public PlayerReplay(ResultSet rs) throws SQLException {
 		this(rs.getInt("PlayerReplayId"), rs.getString("PlayerName"), rs.getBoolean("Winner"),
 				rs.getInt("RaceId"), rs.getInt("ReplayId"), rs.getLong("StartPosBtId"));
+	}
+	
+	/** Retrieve a PlayerReplay from its ID */
+	public static PlayerReplay fromId(long playerReplayIdDb) throws SQLException {
+		DbConnection dbc = DbInterface.getInstance().getDbc();
+		
+		ResultSet rs = dbc.executeQuery("SELECT * FROM playerreplay WHERE playerReplayId=?",
+				playerReplayIdDb);
+		if (rs.next()) {
+			return new PlayerReplay(rs);
+		} else {
+			throw new SQLException("No playerreplay found for ID " + playerReplayIdDb);
+		}
 	}
 	
 	/** Get all actions by this player, in frame order */
@@ -138,7 +152,7 @@ public class PlayerReplay {
 	}
 	
 	/**
-	 * Get all the units belonging to this player this game. Note that they won't all be alive at
+	 * Get all the units belonging to this player this game. Note that they won't all exist at
 	 * once, check their attributes in particular frames with
 	 * {@link Unit#getAttribute(int, util.UnitAttributes.UnitAttribute)}
 	 */
@@ -152,6 +166,35 @@ public class PlayerReplay {
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, "Error retrieving units for player " + playerReplayIdDb, e);
+		}
+		return units;
+	}
+	
+	/**
+	 * Get all units belonging to this player that exist in a particular frame. Faster than getting
+	 * all units and filtering to see if they exist.
+	 */
+	public List<Unit> getUnitsExisting(int frame) {
+		DbConnection dbc = DbInterface.getInstance().getDbc();
+		List<Object> data = new ArrayList<>();
+		data.add(UnitAttribute.Exists.getId());
+		data.add(frame);
+		data.add(playerReplayIdDb);
+		
+		List<Unit> units = new ArrayList<>();
+		try (ResultSet rs = dbc.executeQuery(
+				"SELECT * FROM attributeChange NATURAL JOIN unit NATURAL JOIN"
+				+ " (SELECT unitId, attributeTypeId, max(changeTime) AS changeTime"
+				+ "  FROM attributeChange NATURAL JOIN unit"
+				+ "  WHERE attributeTypeId=? AND changeTime<=? AND playerReplayId=?"
+				+ "  GROUP BY unitId) AS q "
+				+ "WHERE changeVal=1", data) ) {
+			while (rs.next()) {
+				units.add(new Unit(rs));
+			}
+		} catch (SQLException e) {
+			LOGGER.log(Level.SEVERE, "Error retrieving existing units for player "
+					+ playerReplayIdDb + " in frame " + frame, e);
 		}
 		return units;
 	}

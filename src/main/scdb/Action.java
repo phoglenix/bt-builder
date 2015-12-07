@@ -20,6 +20,7 @@ public class Action {
 	private static final Logger LOGGER = Logger.getLogger(Action.class.getName());
 	
 	public final long actionIdDb;
+	public final long playerReplayIdDb;
 	public final int frame;
 	public final UnitCommandType unitCommandType;
 	public final OrderType orderType;
@@ -31,9 +32,11 @@ public class Action {
 	public final int targetY;
 	public final boolean delayed;
 	
-	public Action(long actionIdDb, int frame, int unitCommandTypeId, int orderTypeId,
-			long unitGroupId, int targetId, int targetX, int targetY, boolean delayed) {
+	public Action(long actionIdDb, long playerReplayIdDb, int frame, int unitCommandTypeId,
+			int orderTypeId, long unitGroupId, int targetId, int targetX, int targetY,
+			boolean delayed) {
 		this.actionIdDb = actionIdDb;
+		this.playerReplayIdDb = playerReplayIdDb;
 		this.frame = frame;
 		this.unitCommandType = UnitCommandTypes.getUnitCommandType(unitCommandTypeId);
 		this.orderType = OrderTypes.getOrderType(orderTypeId);
@@ -53,9 +56,23 @@ public class Action {
 	}
 	
 	protected Action(ResultSet rs) throws SQLException {
-		this(rs.getLong("actionId"), rs.getInt("frame"), rs.getInt("unitCommandTypeId"),
-				rs.getInt("orderTypeId"), rs.getLong("unitGroupId"), rs.getInt("targetId"),
-				rs.getInt("targetX"), rs.getInt("targetY"), rs.getBoolean("delayed"));
+		this(rs.getLong("actionId"), rs.getLong("playerReplayId"), rs.getInt("frame"),
+				rs.getInt("unitCommandTypeId"), rs.getInt("orderTypeId"), rs.getLong("unitGroupId"),
+				rs.getInt("targetId"), rs.getInt("targetX"), rs.getInt("targetY"),
+				rs.getBoolean("delayed"));
+	}
+	
+	/** Get the PlayerReplay that issued this Action */
+	public PlayerReplay getPlayerReplay() throws SQLException {
+		DbConnection dbc = DbInterface.getInstance().getDbc();
+		
+		ResultSet rs = dbc.executeQuery("SELECT * FROM playerreplay WHERE playerReplayId=?",
+				playerReplayIdDb);
+		if (rs.next()) {
+			return new PlayerReplay(rs);
+		} else {
+			throw new SQLException("No playerReplay found for action " + actionIdDb);
+		}
 	}
 	
 	/** The unit(s) that the action was issued to. */

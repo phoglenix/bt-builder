@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.Charsets;
 
-import util.Util;
 import util.Util.Pair;
 import bt.GlamEncodingRecord.EncodedPath;
 import bt.GlamResult.Alignment;
@@ -133,11 +132,11 @@ public class BtGlamCodec {
 				alignedSeq.addChild(n);
 			}
 		}
+		// TODO make main stopping point clearer!
 		if (alignedSeq.getChildren().size() == 0) {
 			LOGGER.info("Nothing merged. Stopping.");
 			return null;
 		}
-		er.tree.sanityCheck(alignedSeq, new HashSet<>());
 		BtSelNode lastChild = new BtSelNode();
 		alignedSeq.addChild(lastChild);
 		LOGGER.info("Aligned seq: " + alignedSeq.toStringRecursive(new HashSet<>()) + " hash: "
@@ -188,7 +187,6 @@ public class BtGlamCodec {
 			if (replacement.getWeight() <= 0) {
 				throw new RuntimeException("Negative / zero weight on " + replacement);
 			}
-			er.tree.sanityCheck(replacement);
 			Set<BtNode> replacementsInReplacements = BehaviourTree.findNodesDfs(replacement);
 			replacementsInReplacements.retainAll(replacementParents.keySet());
 			if (!replacementsInReplacements.isEmpty()) {
@@ -201,23 +199,14 @@ public class BtGlamCodec {
 		// Rebuild tree
 		LOGGER.info("Creating modified tree");
 		BtNode newRoot = er.tree.getRoot();
-		LOGGER.info("There are " + BehaviourTree.findNodesDfs(newRoot).size()
-				+ " unique nodes in the tree. By level: "
-				+ Util.join(BehaviourTree.nodeTypeCountsEachLevel(newRoot, 20)));
 		if (newRoot.hasBeenMerged()) {
 			newRoot = newRoot.getMergedActual();
 			LOGGER.info("Replaced root " + er.tree.getRoot() + " with " + newRoot);
 		}
 		newRoot.updateChildren(seen);
-		LOGGER.info("Before merge there are " + BehaviourTree.findNodesDfs(newRoot).size()
-				+ " unique nodes in the tree. By level: "
-				+ Util.join(BehaviourTree.nodeTypeCountsEachLevel(newRoot, 20)));
 		newRoot.mergeChildren(new HashSet<>());
 		// Ensure all children are updated after any merges
 		newRoot.updateChildren(new HashSet<>());
-		LOGGER.info("After merge there are " + BehaviourTree.findNodesDfs(newRoot).size()
-				+ " unique nodes in the tree. By level: "
-				+ Util.join(BehaviourTree.nodeTypeCountsEachLevel(newRoot, 20)));
 
 		BehaviourTree result = new BehaviourTree(newRoot);
 		

@@ -16,8 +16,19 @@ public class BtSeqNode extends BtNode {
 		children.addAll(toCopy.getChildren());
 	}
 	
+	@Override
 	public List<BtNode> getChildren() {
 		return Collections.unmodifiableList(children);
+	}
+	
+	@Override
+	public BtNode getRepresentativeChild() {
+		// Represented by first child
+		if (children.size() > 0) {
+			return children.get(0);
+		} else {
+			return null;
+		}
 	}
 
 	/** Adds the child to the end of this sequence. */
@@ -110,7 +121,8 @@ public class BtSeqNode extends BtNode {
 	}
 	
 	public String toShortString() {
-		return "Sequence: " + getWeight() + (hasBeenMerged() ? "(M)" : "");
+		return "Sequence" + (getWeight() > 1 ? ": " + getWeight() : "")
+				+ (hasBeenMerged() ? " (M)" : "");
 	}
 	
 }

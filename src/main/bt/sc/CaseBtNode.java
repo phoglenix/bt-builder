@@ -27,8 +27,19 @@ public class CaseBtNode extends BtNode implements NodeWithActions {
 	}
 	
 	@Override
+	public BtNode getRepresentativeChild() {
+		// No children
+		return null;
+	}
+	
+	@Override
 	public List<Action> getActions() {
 		return Arrays.asList(new Action[] {action});
+	}
+	
+	@Override
+	public Action getRandomAction() {
+		return action;
 	}
 	
 	@Override

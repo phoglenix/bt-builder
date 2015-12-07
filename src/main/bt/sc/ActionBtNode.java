@@ -51,6 +51,13 @@ public class ActionBtNode extends BtNode implements NodeWithActions {
 	}
 	
 	@Override
+	public Action getRandomAction() {
+		Random r = new Random();
+		int idx = r.nextInt(actions.size());
+		return actions.get(idx);
+	}
+	
+	@Override
 	public long getActionHash() {
 		return hash;
 	}
@@ -112,6 +119,12 @@ public class ActionBtNode extends BtNode implements NodeWithActions {
 	@Override
 	public List<BtNode> getChildren() {
 		return Collections.emptyList();
+	}
+	
+	@Override
+	public BtNode getRepresentativeChild() {
+		// No children
+		return null;
 	}
 
 	@Override

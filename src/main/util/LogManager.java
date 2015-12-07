@@ -27,10 +27,7 @@ public class LogManager {
 			fh.setLevel(fileLevel);
 			LOGGER.setLevel(Level.ALL);
 			LOGGER.addHandler(fh);
-		} catch (SecurityException e) {
-			System.err.println("Error initialising Logger: " + e.getMessage());
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (SecurityException | IOException e) {
 			System.err.println("Error initialising Logger: " + e.getMessage());
 			e.printStackTrace();
 		}

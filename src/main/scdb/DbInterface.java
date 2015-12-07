@@ -1,10 +1,7 @@
 package scdb;
 
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,17 +50,5 @@ public class DbInterface {
 	public DbConnection getDbc() {
 		return dbc;
 	}
-	
-	/** Get list of replays from DB */
-	public List<Replay> getReplays() {
-		List<Replay> replays = new ArrayList<>();
-		try (ResultSet rs = dbc.executeQuery("SELECT * FROM replay", null); ) {
-			while (rs.next()) {
-				replays.add(new Replay(rs));
-			}
-		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, "Getting replay list failed.", e);
-		}
-		return replays;
-	}
+
 }

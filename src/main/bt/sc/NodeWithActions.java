@@ -8,5 +8,7 @@ import scdb.Action;
 public interface NodeWithActions {
 	public List<Action> getActions();
 	
+	public Action getRandomAction();
+	
 	public long getActionHash();
 }

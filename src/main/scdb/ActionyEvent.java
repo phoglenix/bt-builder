@@ -20,17 +20,18 @@ public class ActionyEvent extends Action {
 	public final long eventIdDb;
 	public final long unitIdDb;
 	
-	public ActionyEvent(long eventIdDb, int frame, int unitTypeId, long unitIdDb) {
+	public ActionyEvent(long eventIdDb, long playerReplayIdDb, int frame, int unitTypeId,
+			long unitIdDb) {
 		// -1 set for actionIdDb, unitGroupId, targetX, targetY
 		// delayed always false; ordertype always none
-		super(-1, frame, getUnitCommandTypeId(unitTypeId), OrderTypes.None.getID(), -1, unitTypeId,
-				-1, -1, false);
+		super(-1, playerReplayIdDb, frame, getUnitCommandTypeId(unitTypeId),
+				OrderTypes.None.getID(), -1, unitTypeId, -1, -1, false);
 		this.eventIdDb = eventIdDb;
 		this.unitIdDb = unitIdDb;
 	}
 	
 	public ActionyEvent(ResultSet rs) throws SQLException {
-		this(rs.getLong("eventId"), rs.getInt("frame"), 
+		this(rs.getLong("eventId"), rs.getLong("playerReplayId"), rs.getInt("frame"), 
 				getMorphedUnitTypeId(rs.getInt("unitTypeId"), rs.getInt("eventTypeId")),
 				rs.getInt("unitId"));
 	}
@@ -56,6 +57,8 @@ public class ActionyEvent extends Action {
 				return UnitTypes.Protoss_Archon.getID();
 			} else if (unitTypeId == UnitTypes.Protoss_Dark_Templar.getID()) {
 				return UnitTypes.Protoss_Dark_Archon.getID();
+//			} else if (unitTypeId == UnitTypes.Resource_Vespene_Geyser.getID()) {
+//				return UnitTypes.Protoss_Assimilator.getID();
 			} else {
 				LOGGER.warning("Unexpected unit morph: " + unitTypeId);
 			}

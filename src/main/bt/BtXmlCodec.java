@@ -37,6 +37,9 @@ public class BtXmlCodec {
 	
 	public static void save(BehaviourTree bt, File file) throws IOException {
 		LOGGER.info("Saving tree to file " + file.getAbsolutePath());
+		if (file.exists() && !file.canWrite()) {
+			throw new IOException("Cannot write tree file " + file.getAbsolutePath());
+		}
 		XStream xstream = getXStream();
 		// in case of exception, don't overwrite file until output complete
 		File temp = File.createTempFile("behaviourTree", ".tmp");
@@ -62,6 +65,9 @@ public class BtXmlCodec {
 	public static BehaviourTree load(File file) throws IOException {
 		// Ensure BWAPI data loaded
 		OfflineJNIBWAPI.loadOfflineJNIBWAPIData();
+		if (!file.canRead()) {
+			throw new IOException("Cannot read tree file " + file.getAbsolutePath());
+		}
 		XStream xstream = getXStream();
 		
 		BehaviourTree bt;

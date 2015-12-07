@@ -7,6 +7,7 @@ public abstract class BtNode {
 	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
 			.getLogger(BtNode.class.getName());
 	
+	/** @deprecated pretty sure weight isn't used any more */
 	private int weight;
 	
 	/** If this has been merged into another node, references that node */
@@ -27,6 +28,9 @@ public abstract class BtNode {
 	public abstract BtNode addChild(BtNode child);
 	
 	public abstract List<BtNode> getChildren();
+	
+	/** Get a "representative" child, for checking the gamestate associated with this node */
+	public abstract BtNode getRepresentativeChild();
 	
 	/**
 	 * Get the weight of this node. Each node has a weight to indicate how many maximally-specific

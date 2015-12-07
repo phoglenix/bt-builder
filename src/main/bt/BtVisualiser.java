@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
 
+import bt.sc.ActionBtNode;
+import bt.sc.NodeWithActions;
 import util.Util;
 import util.Util.Pair;
 
@@ -140,9 +142,16 @@ public class BtVisualiser {
 				closed.put(current, ++idCounter);
 				int childCount = 0;
 				for (BtNode child : current.getChildren()) {
+					// Always add high-freq children
+					int childFreq = 0;
+					if (current instanceof BtSelNode) {
+						childFreq = ((BtSelNode) current).getChildCounts().get(child);
+					} else if (current instanceof NodeWithActions) {
+						childFreq = ((NodeWithActions) current).getActions().size();
+					}
 					// Be selective about how many children to show so it's viewable
 					if (childCount < 5 || child.getChildren().size() > 0 && childCount < 20
-							|| child.hasBeenMerged()) {
+							|| child.hasBeenMerged() || childFreq > 10) {
 						open.add(child);
 						childCount++;
 					}
@@ -169,8 +178,12 @@ public class BtVisualiser {
 				for (int childIdx = 0; childIdx < children.size(); childIdx++) {
 					BtNode child = children.get(childIdx);
 					int freq = 1;
+					int weight = 1; // Not on label
 					if (e.getKey() instanceof BtSelNode) {
 						freq = ((BtSelNode) e.getKey()).getChildCounts().get(child);
+					}
+					if (child instanceof ActionBtNode) {
+						weight = ((ActionBtNode) child).getActions().size();
 					}
 					if (closed.containsKey(child) && numExcludedNodes > 0) {
 						// nodes have been excluded in between children, write ellipsis first
@@ -182,7 +195,7 @@ public class BtVisualiser {
 						if (freq == 1)
 							label = "";
 						out.write(String.format("%d -> %d [weight=%d%s];\n",
-								parentId, closed.get(child), freq, label));
+								parentId, closed.get(child), freq + weight, label));
 					} else {
 						numExcludedNodes += freq;
 					}

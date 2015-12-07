@@ -15,6 +15,7 @@ public class Replay {
 	public final int dbReplayId;
 	/** Should be accessed via {@link #getMap()} */
 	private final int dbMapId;
+	/** Name of the replay file, eg. GG1091.rep */
 	public final String replayFileName;
 	/** Total number of frames in the game. */
 	public final int duration;
@@ -29,6 +30,20 @@ public class Replay {
 	public Replay(ResultSet rs) throws SQLException {
 		this(rs.getInt("ReplayId"), rs.getInt("MapId"), rs.getString("ReplayName"),
 				rs.getInt("Duration"));
+	}
+	
+	/** Get list of all replays from DB */
+	public static List<Replay> getReplays() {
+		DbConnection dbc = DbInterface.getInstance().getDbc();
+		List<Replay> replays = new ArrayList<>();
+		try (ResultSet rs = dbc.executeQuery("SELECT * FROM replay", null); ) {
+			while (rs.next()) {
+				replays.add(new Replay(rs));
+			}
+		} catch (SQLException e) {
+			LOGGER.log(Level.SEVERE, "Getting replay list failed.", e);
+		}
+		return replays;
 	}
 	
 	/** Get players for this replay */

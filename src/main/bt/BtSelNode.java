@@ -89,6 +89,17 @@ public class BtSelNode extends BtNode {
 	public Map<BtNode, Integer> getChildCounts() {
 		return Collections.unmodifiableMap(childCounts);
 	}
+	
+	@Override
+	public BtNode getRepresentativeChild() {
+		// Use most-frequent child
+		Optional<Entry<BtNode, Integer>> a = childCounts.entrySet().stream()
+				.max(Comparator.comparingInt(e -> e.getValue()));
+		if (a.isPresent()) {
+			return a.get().getKey();
+		}
+		return null;
+	}
 
 	@Override
 	public BtNode duplicateWithoutChildren() {
@@ -163,6 +174,7 @@ public class BtSelNode extends BtNode {
 	}
 	
 	public String toShortString() {
-		return "Selector: " + getWeight() + (hasBeenMerged() ? "(M)" : "");
+		return "Selector" + (getWeight() > 1 ? ": " + getWeight() : "")
+				+ (hasBeenMerged() ? " (M)" : "");
 	}
 }

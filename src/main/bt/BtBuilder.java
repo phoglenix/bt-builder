@@ -2,6 +2,7 @@ package bt;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
@@ -136,7 +137,7 @@ public class BtBuilder {
 	 * a single choice (branch) node at the root, and all nodes in sequences without further
 	 * branching.
 	 */
-	private BehaviourTree makeTree(DbInterface dbi, File treeFile, NodeType nodeType) {
+	private BehaviourTree makeTree(DbInterface dbi, File treeFile, NodeType nodeType) throws IOException {
 		BehaviourTree tree = null;
 		if (treeFile.isFile()) {
 			LOGGER.info("Tree file already exists. Loading / Resuming building.");
@@ -150,12 +151,25 @@ public class BtBuilder {
 			LOGGER.info("Tree file doesn't exist. Starting a new one.");
 			tree = new BehaviourTree();
 		}
+		// HACKED IN FOR CROSS VALIDATION TEST
+		{
+			List<String> randomReplays = Files.readAllLines(
+					new File("ReplaysInRandomOrderPvP.txt").toPath());
+			int foldNum = BtTester.FOLD_NUM;
+			int numFolds = BtTester.NUM_FOLDS;
+			int start = (int) ((foldNum - 1) / (double) numFolds * randomReplays.size());
+			int end = (int) (foldNum / (double) numFolds * randomReplays.size());
+			for (String replayName : randomReplays.subList(start, end)) {
+				tree.setProcessed(replayName);
+			}
+		}
+		// END OF HACKY BIT
 		
-		int numReplays = dbi.getReplays().size();
+		int numReplays = Replay.getReplays().size();
 		int replayCount = 0;
 		int playerReplayCount = 0;
 		// Start/resume building BT from DB
-		for (Replay replay : dbi.getReplays()) {
+		for (Replay replay : Replay.getReplays()) {
 			replayCount++;
 			if (tree.getProcessed().contains(replay.replayFileName)) {
 				LOGGER.fine("Skipping replay (already processed): " + replay.replayFileName);
